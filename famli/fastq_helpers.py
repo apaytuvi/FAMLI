@@ -43,24 +43,24 @@ def set_up_sra_cache_folder(temp_folder):
     """Set up the fastq-dump cache folder within the temp folder."""
     logging.info("Setting up fastq-dump cache within {}".format(temp_folder))
     for path in [
-        "/root/ncbi",
-        "/root/ncbi/public"
+        os.path.expanduser("~/ncbi"),
+        os.path.expanduser("~/ncbi/public")
     ]:
         if os.path.exists(path) is False:
             os.mkdir(path)
 
-    if os.path.exists("/root/ncbi/public/sra"):
-        shutil.rmtree("/root/ncbi/public/sra")
+    if os.path.exists(os.path.expanduser("~/ncbi/public/sra")):
+        shutil.rmtree(os.path.expanduser("~/ncbi/public/sra"))
 
     # Now make a folder within the temp folder
     temp_cache = os.path.join(temp_folder, "sra")
     assert os.path.exists(temp_cache) is False
     os.mkdir(temp_cache)
 
-    # Symlink it to /root/ncbi/public/sra/
-    run_cmds(["ln", "-s", "-f", temp_cache, "/root/ncbi/public/sra"])
+    # Symlink it to ~/ncbi/public/sra/
+    run_cmds(["ln", "-s", "-f", temp_cache, os.path.expanduser("~/ncbi/public/sra")])
 
-    assert os.path.exists("/root/ncbi/public/sra")
+    assert os.path.exists(os.path.expanduser("~/ncbi/public/sra"))
 
 
 def get_reads_from_url(
@@ -215,7 +215,7 @@ def get_sra(accession, temp_folder):
             os.unlink(fp)
 
     # Remove the cache file, if any
-    cache_fp = "/root/ncbi/public/sra/{}.sra".format(accession)
+    cache_fp = "~/ncbi/public/sra/{}.sra".format(accession)
     if os.path.exists(cache_fp):
         logging.info("Removing {}".format(cache_fp))
         os.unlink(cache_fp)
@@ -275,6 +275,7 @@ def clean_fastq_headers(fp_in, folder_out):
     # Make a new file in the output folder
     fp_out = os.path.join(folder_out, fp_in.split("/")[-1])
     # Don't gzip the output
+
     if fp_out.endswith(".gz"):
         fp_out = fp_out[:-3]
 
